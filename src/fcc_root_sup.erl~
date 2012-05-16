@@ -1,0 +1,21 @@
+-module(fcc_root_sup).
+-behaviour(supervisor).
+
+%% API 
+-export([start_link/1]).
+%% Supcb 
+-export([init/1]).
+
+-define (SERVER, ?MODULE).
+
+start_link(LSock) ->
+
+    supervisor:start_link({local, ?SERVER}, ?MODULE, [LSock]).
+
+init([LSock]) ->
+    ElementSup = {bi_server_sup, {bi_server_sup, start_link, [LSock]}, 
+		  permanent, 2000, supervisor, [bi_server]},
+    Children = [ElementSup],
+    RestartStrategy = {one_for_one, 4, 3600},
+    {ok, {RestartStrategy, Children}}.
+

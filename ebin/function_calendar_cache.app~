@@ -1,0 +1,11 @@
+{application, function_calendar_cache,
+ [{description, "Cache of Function Calendars"},
+  {vsn, "0.1.0"},
+  {modules, [
+             fcc_app,
+             fcc_sup
+            ]},
+  {registered, [fcc_sup]},
+  {applications, [kernel, stdlib]},
+  {mod, {fcc_app, []}}
+ ]}.

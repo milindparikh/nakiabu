@@ -1,0 +1,47 @@
+-module(fcc_function_calendar_element).
+-behaviour(gen_server).
+-export([start_link/4, create/4]).
+-export([init/1, terminate/2, code_change/3, handle_call/3, handle_cast/2, handle_info/2]).
+
+-define(SERVER, ?MODULE).
+-record(state, {functionversionname, startdate,enddate, sourcecode}).
+
+
+start_link(FunctionVersionName, StartDate, EndDate, SourceCode) ->
+    gen_server:start_link(?MODULE, [FunctionVersionName,
+				    StartDate, 
+				    EndDate, 
+				    SourceCode], []).
+
+create(FunctionVersionName, StartDate, EndDate, SourceCode) ->
+    fcc_function_version_sup:start_child(FunctionVersionName,
+					 StartDate, 
+					 EndDate,
+					 SourceCode).
+
+
+init([FunctionVersionName, StartDate, EndDate, SourceCode]) ->
+    {ok,
+     #state {
+       functionversionname = FunctionVersionName,
+       startdate = StartDate,
+       enddate = EndDate,
+       sourcecode = SourceCode
+      }}.
+
+
+handle_call(_, _, _) ->
+    ok.
+
+handle_cast(_,_) ->
+    ok.
+
+handle_info(timeout, State ) ->
+    {stop, normal, State}.
+
+terminate(_Reason, _State) ->
+    fcc_store:delete(self()),
+    ok.
+code_change(_OldVsn, State, _NewVsn) ->
+    {ok, State}.
+
